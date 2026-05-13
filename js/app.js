@@ -43,7 +43,10 @@ const App = (() => {
     // 7. Render tags
     renderTags();
 
-    // 8. Load initial post (from URL hash or latest)
+    // 8. TOC Active State on Scroll
+    window.addEventListener('scroll', throttle(updateTOCActiveState, 100));
+
+    // 9. Load initial post (from URL hash or latest)
     const hash = window.location.hash.replace('#/', '');
     if (hash && POST_REGISTRY.find(p => p.date === hash)) {
       DateNavigator.navigateTo(hash);
@@ -128,6 +131,12 @@ const App = (() => {
       // Initialize mermaid diagrams
       initMermaid();
 
+      // Setup Copy Buttons
+      setupCopyButtons();
+
+      // Generate TOC
+      generateTOC();
+
       // Scroll to top
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -169,6 +178,111 @@ const App = (() => {
           } catch (e2) { /* ignore */ }
         }
       });
+    }
+  }
+
+  function setupCopyButtons() {
+    const codeBlocks = document.querySelectorAll('.markdown-body pre');
+    codeBlocks.forEach(pre => {
+      // Wrap pre in code-wrapper
+      const wrapper = document.createElement('div');
+      wrapper.className = 'code-wrapper animate-fade-in';
+      pre.parentNode.insertBefore(wrapper, pre);
+      wrapper.appendChild(pre);
+
+      // Add copy button
+      const btn = document.createElement('button');
+      btn.className = 'copy-btn';
+      btn.textContent = 'Copy';
+      wrapper.appendChild(btn);
+
+      btn.addEventListener('click', () => {
+        const code = pre.querySelector('code').innerText;
+        navigator.clipboard.writeText(code).then(() => {
+          btn.textContent = 'Copied!';
+          btn.classList.add('copied');
+          setTimeout(() => {
+            btn.textContent = 'Copy';
+            btn.classList.remove('copied');
+          }, 2000);
+        });
+      });
+    });
+  }
+
+  function generateTOC() {
+    const content = document.querySelector('.markdown-body');
+    const tocList = document.getElementById('toc-list');
+    if (!content || !tocList) return;
+
+    tocList.innerHTML = '';
+    const headings = content.querySelectorAll('h2, h3');
+
+    if (headings.length === 0) {
+      document.getElementById('toc').style.display = 'none';
+      return;
+    } else {
+      // Show TOC if on desktop (handled by CSS, but ensure it's not force-hidden)
+      document.getElementById('toc').style.display = '';
+    }
+
+    headings.forEach((heading, i) => {
+      // Add ID if not present
+      if (!heading.id) {
+        heading.id = `heading-${i}`;
+      }
+
+      const li = document.createElement('li');
+      li.className = `toc__item toc__item--${heading.tagName.toLowerCase()}`;
+
+      const a = document.createElement('a');
+      a.href = `#${heading.id}`;
+      a.className = 'toc__link';
+      a.textContent = heading.innerText.replace(/^#+\s*/, ''); // Strip markdown chars if any
+
+      a.addEventListener('click', (e) => {
+        e.preventDefault();
+        const target = document.getElementById(heading.id);
+        const headerHeight = document.getElementById('header').offsetHeight;
+        window.scrollTo({
+          top: target.offsetTop - headerHeight - 20,
+          behavior: 'smooth'
+        });
+        // Update URL without jump
+        history.pushState(null, null, `#${heading.id}`);
+      });
+
+      li.appendChild(a);
+      tocList.appendChild(li);
+    });
+  }
+
+  function updateTOCActiveState() {
+    const headings = Array.from(document.querySelectorAll('.markdown-body h2, .markdown-body h3'));
+    const tocLinks = document.querySelectorAll('.toc__link');
+    const headerHeight = document.getElementById('header').offsetHeight;
+    const scrollPos = window.scrollY + headerHeight + 50;
+
+    let activeId = '';
+    for (let i = headings.length - 1; i >= 0; i--) {
+      if (scrollPos >= headings[i].offsetTop) {
+        activeId = headings[i].id;
+        break;
+      }
+    }
+
+    tocLinks.forEach(link => {
+      link.classList.toggle('active', link.getAttribute('href') === `#${activeId}`);
+    });
+  }
+
+  function throttle(fn, wait) {
+    let time = Date.now();
+    return function() {
+      if ((time + wait - Date.now()) < 0) {
+        fn();
+        time = Date.now();
+      }
     }
   }
 
