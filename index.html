@@ -1,0 +1,150 @@
+<!DOCTYPE html>
+<html lang="vi" data-theme="dark">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Daily NoteBook — Cybersecurity Learning Journal</title>
+  <meta name="description" content="Daily NoteBook - A cybersecurity learning journal documenting Network, CCNA, and OSCP+ study progress. Built by An.">
+  <meta name="author" content="An">
+  <meta name="keywords" content="cybersecurity, CCNA, OSCP, pentest, network, security, learning, journal">
+
+  <!-- Open Graph -->
+  <meta property="og:title" content="Daily NoteBook — Cybersecurity Learning Journal">
+  <meta property="og:description" content="Follow my daily cybersecurity learning journey — from CCNA to OSCP+">
+  <meta property="og:type" content="website">
+
+  <!-- Favicon -->
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🛡️</text></svg>">
+
+  <!-- Google Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+
+  <!-- Highlight.js -->
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/styles/github-dark.min.css">
+
+  <!-- CSS -->
+  <link rel="stylesheet" href="css/reset.css">
+  <link rel="stylesheet" href="css/variables.css">
+  <link rel="stylesheet" href="css/base.css">
+  <link rel="stylesheet" href="css/layout.css">
+  <link rel="stylesheet" href="css/components.css">
+  <link rel="stylesheet" href="css/animations.css">
+  <link rel="stylesheet" href="css/markdown.css">
+</head>
+<body>
+  <!-- Matrix Rain Background -->
+  <canvas id="matrix-canvas"></canvas>
+
+  <div class="app">
+    <!-- ═══ Header ═══ -->
+    <header class="header" id="header">
+      <div class="header__brand">
+        <button class="menu-toggle" id="menu-toggle" aria-label="Toggle menu">☰</button>
+        <a href="#/" class="header__logo">
+          <span class="header__logo-icon">🛡️</span>
+          DAILY NOTEBOOK
+        </a>
+        <span class="header__subtitle">
+          &gt; cybersecurity_journal<span class="header__cursor"></span>
+        </span>
+      </div>
+
+      <div class="header__actions">
+        <!-- Search (compact) -->
+        <div class="search-box" style="max-width: 200px;">
+          <span class="search-box__icon">🔍</span>
+          <input type="text" class="search-box__input" id="search-input"
+                 placeholder="Search... (Ctrl+K)" autocomplete="off">
+        </div>
+
+        <!-- Theme Toggle -->
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+          <span class="theme-toggle__slider">🌙</span>
+        </button>
+      </div>
+    </header>
+
+    <!-- ═══ Main Layout ═══ -->
+    <div class="main-layout">
+      <!-- Sidebar Overlay (mobile) -->
+      <div class="sidebar-overlay" id="sidebar-overlay"></div>
+
+      <!-- Sidebar -->
+      <aside class="sidebar" id="sidebar">
+        <!-- Date List -->
+        <div id="date-list">
+          <div class="loading">
+            <div class="loading__spinner"></div>
+            <span>Loading entries...</span>
+          </div>
+        </div>
+
+        <!-- Tags Cloud -->
+        <div class="sidebar__section">
+          <div class="sidebar__title">🏷️ Tags</div>
+          <div class="tags-container" id="tags-cloud"></div>
+        </div>
+
+        <!-- Info -->
+        <div class="sidebar__section">
+          <div class="sidebar__title">ℹ️ About</div>
+          <p style="font-size: var(--text-xs); color: var(--color-text-dim); line-height: 1.6;">
+            Daily learning journal for<br>
+            <strong style="color: var(--color-primary);">Network & Cybersecurity</strong><br>
+            CCNA • OSCP+ prep
+          </p>
+          <p style="font-size: var(--text-xs); color: var(--color-text-dim); margin-top: var(--space-2);">
+            ⌨️ Use <kbd style="background: var(--color-surface-2); padding: 1px 6px; border-radius: 3px; font-size: 10px;">←</kbd>
+            <kbd style="background: var(--color-surface-2); padding: 1px 6px; border-radius: 3px; font-size: 10px;">→</kbd>
+            to navigate
+          </p>
+        </div>
+      </aside>
+
+      <!-- Content -->
+      <main class="content" id="main-content">
+        <div id="post-content">
+          <div class="welcome animate-fade-in">
+            <div class="welcome__icon">🛡️</div>
+            <h2 class="welcome__title">Loading...</h2>
+            <p class="welcome__text">Initializing terminal...</p>
+          </div>
+        </div>
+      </main>
+    </div>
+
+    <!-- ═══ Footer ═══ -->
+    <footer class="footer">
+      <p>
+        Built with <span class="footer__heart">💚</span> by
+        <a href="https://github.com/Andlpde150032" target="_blank" rel="noopener">An</a>
+        &nbsp;|&nbsp; Powered by
+        <a href="https://pages.github.com/" target="_blank" rel="noopener">GitHub Pages</a>
+        &nbsp;|&nbsp;
+        <span class="font-mono" style="font-size: var(--text-xs);">
+          CCNA → OSCP+ Journey 🚀
+        </span>
+      </p>
+    </footer>
+  </div>
+
+  <!-- ═══ Scripts ═══ -->
+  <!-- CDN Libraries -->
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/marked/12.0.2/marked.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/highlight.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/bash.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/powershell.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/highlight.js/11.9.0/languages/python.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/mermaid/10.9.1/mermaid.min.js"></script>
+
+  <!-- App Modules -->
+  <script src="js/theme.js"></script>
+  <script src="js/effects.js"></script>
+  <script src="js/markdown-renderer.js"></script>
+  <script src="js/date-navigator.js"></script>
+  <script src="js/search.js"></script>
+  <script src="js/app.js"></script>
+</body>
+</html>

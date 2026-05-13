@@ -1,0 +1,122 @@
+/* ============================================
+   Base Styles — Typography & Globals
+   ============================================ */
+
+body {
+  font-family: var(--font-body);
+  font-size: var(--text-base);
+  color: var(--color-text);
+  background-color: var(--color-bg);
+  transition: background-color var(--transition-theme),
+              color var(--transition-theme);
+  overflow-x: hidden;
+}
+
+/* ─── Headings ─── */
+h1, h2, h3, h4, h5, h6 {
+  font-family: var(--font-heading);
+  font-weight: 700;
+  line-height: 1.3;
+  letter-spacing: -0.02em;
+}
+
+h1 { font-size: var(--text-4xl); }
+h2 { font-size: var(--text-3xl); }
+h3 { font-size: var(--text-2xl); }
+h4 { font-size: var(--text-xl); }
+h5 { font-size: var(--text-lg); }
+h6 { font-size: var(--text-base); }
+
+/* ─── Links ─── */
+a {
+  color: var(--color-primary);
+  transition: color var(--transition-fast),
+              text-shadow var(--transition-fast);
+}
+
+a:hover {
+  color: var(--color-secondary);
+  text-shadow: var(--glow-subtle);
+}
+
+/* ─── Selection ─── */
+::selection {
+  background: rgba(var(--color-primary-rgb), 0.3);
+  color: var(--color-text);
+}
+
+/* ─── Focus visible ─── */
+:focus-visible {
+  outline: 2px solid var(--color-primary);
+  outline-offset: 2px;
+  border-radius: var(--radius-sm);
+}
+
+/* ─── Code (inline) ─── */
+code {
+  font-family: var(--font-code);
+  font-size: 0.9em;
+  padding: 0.15em 0.4em;
+  background: var(--color-code-bg);
+  border: 1px solid var(--color-code-border);
+  border-radius: var(--radius-sm);
+  transition: background-color var(--transition-theme),
+              border-color var(--transition-theme);
+}
+
+/* ─── Horizontal Rule ─── */
+hr {
+  border: none;
+  height: 1px;
+  background: linear-gradient(
+    90deg,
+    transparent,
+    var(--color-border),
+    var(--color-primary),
+    var(--color-border),
+    transparent
+  );
+  margin: var(--space-8) 0;
+}
+
+/* ─── Utility classes ─── */
+.visually-hidden {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  border: 0;
+}
+
+.text-primary { color: var(--color-primary); }
+.text-secondary { color: var(--color-secondary); }
+.text-accent { color: var(--color-accent); }
+.text-muted { color: var(--color-text-muted); }
+.text-danger { color: var(--color-danger); }
+
+.font-mono { font-family: var(--font-heading); }
+.font-code { font-family: var(--font-code); }
+
+/* ─── Scanline overlay effect ─── */
+body::after {
+  content: '';
+  position: fixed;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
+  z-index: 9999;
+  background: repeating-linear-gradient(
+    0deg,
+    rgba(0, 0, 0, var(--scanline-opacity)) 0px,
+    rgba(0, 0, 0, var(--scanline-opacity)) 1px,
+    transparent 1px,
+    transparent 3px
+  );
+  opacity: 1;
+  transition: opacity var(--transition-theme);
+}

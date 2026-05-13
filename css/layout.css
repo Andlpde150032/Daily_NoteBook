@@ -1,0 +1,147 @@
+/* ============================================
+   Layout — Page Structure
+   ============================================ */
+
+.app {
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
+  position: relative;
+}
+
+.header {
+  position: sticky;
+  top: 0;
+  z-index: var(--z-header);
+  height: var(--header-height);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 var(--space-6);
+  background: rgba(var(--color-bg-rgb), 0.85);
+  backdrop-filter: blur(12px);
+  border-bottom: 1px solid var(--color-border);
+  transition: background-color var(--transition-theme), border-color var(--transition-theme);
+}
+
+.header__brand { display: flex; align-items: center; gap: var(--space-3); }
+.header__logo {
+  font-family: var(--font-heading);
+  font-size: var(--text-xl);
+  font-weight: 800;
+  color: var(--color-primary);
+  letter-spacing: -0.03em;
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.header__subtitle {
+  font-family: var(--font-heading);
+  font-size: var(--text-xs);
+  color: var(--color-text-muted);
+  display: flex;
+  align-items: center;
+  gap: var(--space-1);
+}
+
+.header__cursor {
+  display: inline-block;
+  width: 8px;
+  height: 16px;
+  background: var(--color-primary);
+  animation: blink 1s step-end infinite;
+}
+
+.header__actions { display: flex; align-items: center; gap: var(--space-3); }
+
+.main-layout { display: flex; flex: 1; position: relative; }
+
+.sidebar {
+  width: var(--sidebar-width);
+  min-height: calc(100vh - var(--header-height));
+  padding: var(--space-6);
+  border-right: 1px solid var(--color-border);
+  background: var(--color-surface);
+  overflow-y: auto;
+  position: sticky;
+  top: var(--header-height);
+  max-height: calc(100vh - var(--header-height));
+  transition: background-color var(--transition-theme), border-color var(--transition-theme), transform var(--transition-base);
+  flex-shrink: 0;
+}
+
+.sidebar__section { margin-bottom: var(--space-8); }
+.sidebar__title {
+  font-family: var(--font-heading);
+  font-size: var(--text-xs);
+  font-weight: 600;
+  color: var(--color-text-muted);
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  margin-bottom: var(--space-4);
+  display: flex;
+  align-items: center;
+  gap: var(--space-2);
+}
+
+.content {
+  flex: 1;
+  padding: var(--space-8);
+  max-width: calc(var(--max-content-width) + var(--space-16));
+  margin: 0 auto;
+  width: 100%;
+}
+
+.footer {
+  padding: var(--space-6) var(--space-8);
+  border-top: 1px solid var(--color-border);
+  text-align: center;
+  font-size: var(--text-sm);
+  color: var(--color-text-muted);
+  background: var(--color-surface);
+  transition: background-color var(--transition-theme), border-color var(--transition-theme);
+}
+
+.footer a { color: var(--color-primary); }
+.footer__heart { color: var(--color-danger); display: inline-block; animation: heartbeat 2s ease-in-out infinite; }
+
+.menu-toggle {
+  display: none;
+  width: 40px; height: 40px;
+  align-items: center; justify-content: center;
+  border-radius: var(--radius-md);
+  color: var(--color-text);
+  font-size: var(--text-xl);
+  transition: background-color var(--transition-fast);
+}
+.menu-toggle:hover { background: var(--color-surface-2); }
+
+.sidebar-overlay {
+  display: none;
+  position: fixed; top: 0; left: 0; right: 0; bottom: 0;
+  background: var(--color-overlay);
+  z-index: calc(var(--z-sidebar) - 1);
+  opacity: 0;
+  transition: opacity var(--transition-base);
+}
+.sidebar-overlay.active { opacity: 1; }
+
+@media (max-width: 768px) {
+  .header { padding: 0 var(--space-4); }
+  .header__subtitle { display: none; }
+  .menu-toggle { display: flex; }
+  .sidebar {
+    position: fixed; top: var(--header-height); left: 0; bottom: 0;
+    z-index: var(--z-sidebar); transform: translateX(-100%);
+    box-shadow: var(--shadow-xl);
+  }
+  .sidebar.open { transform: translateX(0); }
+  .sidebar-overlay { display: block; }
+  .content { padding: var(--space-4); }
+}
+
+@media (max-width: 480px) {
+  .header__logo { font-size: var(--text-lg); }
+  .content { padding: var(--space-3); }
+}
