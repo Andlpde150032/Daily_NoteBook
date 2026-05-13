@@ -1,0 +1,12 @@
+User-agent: *
+Allow: /
+
+# Explicitly allow Facebook and other social scrapers
+User-agent: facebookexternalhit
+Allow: /
+
+User-agent: Facebot
+Allow: /
+
+User-agent: Twitterbot
+Allow: /
