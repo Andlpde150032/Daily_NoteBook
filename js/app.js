@@ -85,7 +85,12 @@ const App = (() => {
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
 
       const rawMd = await response.text();
-      const { meta, body } = MarkdownRenderer.parseFrontmatter(rawMd);
+      // Update Title & Meta for SEO
+      document.title = `${post.title} — Daily NoteBook`;
+      const metaDesc = document.querySelector('meta[name="description"]');
+      if (metaDesc) {
+        metaDesc.setAttribute('content', `Bài viết ngày ${post.date}: ${post.title}. Lộ trình học tập Cybersecurity hàng ngày.`);
+      }
 
       // Build post header
       const d = new Date(post.date);
