@@ -144,6 +144,9 @@ const App = (() => {
       // Generate TOC
       generateTOC();
 
+      // Setup Image Modal
+      setupImageModal();
+
       // Scroll to top
       window.scrollTo({ top: 0, behavior: 'smooth' });
 
@@ -262,6 +265,79 @@ const App = (() => {
       li.appendChild(a);
       tocList.appendChild(li);
     });
+  }
+
+  function setupImageModal() {
+    const modal = document.getElementById('image-modal');
+    const modalImg = document.getElementById('modal-img');
+    const modalCaption = document.getElementById('modal-caption');
+    const modalCounter = document.getElementById('modal-counter');
+    const modalPrev = document.getElementById('modal-prev');
+    const modalNext = document.getElementById('modal-next');
+
+    if (!modal || !modalImg) return;
+
+    let currentImages = [];
+    let currentIndex = 0;
+
+    // Find all images in markdown content
+    const images = document.querySelectorAll('.markdown-body img');
+    currentImages = Array.from(images);
+
+    images.forEach((img, index) => {
+      img.addEventListener('click', () => {
+        currentIndex = index;
+        updateModal();
+        modal.classList.add('image-modal--active');
+        document.body.style.overflow = 'hidden'; // Lock scroll
+      });
+    });
+
+    function updateModal(direction = 'next') {
+      const img = currentImages[currentIndex];
+      
+      // Add animation classes
+      modalImg.classList.remove('slide-in-right', 'slide-in-left');
+      void modalImg.offsetWidth; // Force reflow
+      
+      modalImg.src = img.src;
+      modalCaption.textContent = `Ảnh ${currentIndex + 1}: ${img.alt || 'No caption'}`;
+      modalCounter.textContent = `${currentIndex + 1} / ${currentImages.length}`;
+      
+      modalImg.classList.add(direction === 'next' ? 'slide-in-right' : 'slide-in-left');
+    }
+
+    function prev() {
+      if (currentImages.length === 0) return;
+      currentIndex = (currentIndex - 1 + currentImages.length) % currentImages.length;
+      updateModal('prev');
+    }
+
+    function next() {
+      if (currentImages.length === 0) return;
+      currentIndex = (currentIndex + 1) % currentImages.length;
+      updateModal('next');
+    }
+
+    modalPrev.onclick = (e) => { e.stopPropagation(); prev(); };
+    modalNext.onclick = (e) => { e.stopPropagation(); next(); };
+
+    modal.onclick = () => {
+      modal.classList.remove('image-modal--active');
+      document.body.style.overflow = ''; // Unlock scroll
+    };
+
+    // Global keyboard listener
+    window.onkeydown = (e) => {
+      if (!modal.classList.contains('image-modal--active')) return;
+
+      if (e.key === 'ArrowLeft') prev();
+      if (e.key === 'ArrowRight') next();
+      if (e.key === 'Escape') {
+        modal.classList.remove('image-modal--active');
+        document.body.style.overflow = '';
+      }
+    };
   }
 
   function updateTOCActiveState() {
