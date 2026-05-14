@@ -129,6 +129,10 @@ const DateNavigator = (() => {
       // Don't trigger if user is typing in search
       if (e.target.tagName === 'INPUT') return;
 
+      // Don't trigger if image modal is open
+      const modal = document.getElementById('image-modal');
+      if (modal && modal.classList.contains('image-modal--active')) return;
+
       if (e.key === 'ArrowLeft') {
         e.preventDefault();
         goPrev();

@@ -333,17 +333,23 @@ const App = (() => {
       document.body.style.overflow = ''; // Unlock scroll
     };
 
-    // Global keyboard listener
-    window.onkeydown = (e) => {
+    // Global keyboard listener for modal
+    document.addEventListener('keydown', (e) => {
       if (!modal.classList.contains('image-modal--active')) return;
 
-      if (e.key === 'ArrowLeft') prev();
-      if (e.key === 'ArrowRight') next();
+      if (e.key === 'ArrowLeft') {
+        e.preventDefault();
+        prev();
+      }
+      if (e.key === 'ArrowRight') {
+        e.preventDefault();
+        next();
+      }
       if (e.key === 'Escape') {
         modal.classList.remove('image-modal--active');
         document.body.style.overflow = '';
       }
-    };
+    });
   }
 
   function updateTOCActiveState() {
