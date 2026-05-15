@@ -39,8 +39,15 @@ const App = (() => {
       id: 'redteam-ad',
       category: 'Red Team',
       title: 'AD Pentest Cheatsheet',
-      icon: '🛡️',
+      icon: '⚔️',
       file: 'cheatsheets/redteam.md'
+    },
+    {
+      id: 'blueteam-defense',
+      category: 'Blue Team',
+      title: 'Defense & Hardening',
+      icon: '🛡️',
+      file: 'cheatsheets/blueteam.md'
     }
   ];
 
