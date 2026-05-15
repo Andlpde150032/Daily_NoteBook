@@ -3,9 +3,10 @@
    ============================================ */
 
 .markdown-body {
-  line-height: 1.8;
+  line-height: 1.7;
   color: var(--color-text);
   font-size: var(--text-base);
+  letter-spacing: -0.011em;
   transition: color var(--transition-theme);
 }
 
@@ -19,6 +20,7 @@
   margin-bottom: var(--space-4);
   color: var(--color-text);
   position: relative;
+  letter-spacing: -0.02em;
 }
 
 .markdown-body h1 { font-size: var(--text-3xl); }
@@ -33,11 +35,14 @@
 .markdown-body h2::before {
   content: '## ';
   color: var(--color-primary);
-  opacity: 0.5;
+  font-weight: 400;
+  opacity: 0.6;
 }
 .markdown-body h3::before {
   content: '### ';
-  opacity: 0.5;
+  color: var(--color-primary);
+  font-weight: 400;
+  opacity: 0.6;
 }
 
 /* ─── Paragraphs ─── */
@@ -139,11 +144,12 @@
 .markdown-body code {
   font-family: var(--font-code);
   font-size: 0.88em;
-  padding: 0.15em 0.45em;
+  padding: 0.2em 0.4em;
   background: var(--color-code-bg);
   border: 1px solid var(--color-code-border);
   border-radius: var(--radius-sm);
-  color: var(--color-primary);
+  color: var(--color-primary-dim);
+  font-weight: 500;
 }
 
 /* ─── Blockquotes ─── */

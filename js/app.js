@@ -84,8 +84,28 @@ const App = (() => {
     // 8. TOC Active State on Scroll
     window.addEventListener('scroll', throttle(updateTOCActiveState, 100));
 
-    // 9. Listen hash changes
+    // 9. Glitch Overlay
+    setupGlitchOverlay();
+
+    // 10. Listen hash changes
     window.addEventListener('hashchange', route);
+  }
+
+  function setupGlitchOverlay() {
+    if (document.querySelector('.glitch-overlay')) return;
+    const overlay = document.createElement('div');
+    overlay.className = 'glitch-overlay';
+    document.body.appendChild(overlay);
+  }
+
+  function triggerGlitch(duration = 300) {
+    const overlay = document.querySelector('.glitch-overlay');
+    if (overlay) {
+      overlay.classList.add('glitch-overlay--active');
+      setTimeout(() => {
+        overlay.classList.remove('glitch-overlay--active');
+      }, duration);
+    }
   }
 
   function route() {
@@ -112,12 +132,9 @@ const App = (() => {
         switchViewMode('journal', false);
         DateNavigator.navigateTo(date);
       }
-    } else if (hash === '#/') {
-      // Default: Load latest journal post
-      if (POST_REGISTRY.length > 0) {
-        const latest = [...POST_REGISTRY].sort((a, b) => b.date.localeCompare(a.date))[0];
-        window.location.hash = `#/${latest.date}`;
-      }
+    } else if (hash === '#/about' || hash === '#/') {
+      // Default: Show the About / Landing page
+      showAboutPage();
     }
   }
 
@@ -206,8 +223,10 @@ const App = (() => {
       contentEl.innerHTML = `
         <div class="loading">
           <div class="loading__spinner"></div>
-          <span>Loading content...</span>
+          <span>Decoding stream...</span>
         </div>`;
+      
+      triggerGlitch(300);
 
       const response = await fetch(filePath);
       if (!response.ok) throw new Error(`HTTP ${response.status}`);
@@ -256,8 +275,10 @@ const App = (() => {
     contentEl.innerHTML = `
       <div class="loading">
         <div class="loading__spinner"></div>
-        <span>Loading entry...</span>
+        <span>Intercepting packet...</span>
       </div>`;
+    
+    triggerGlitch(300);
 
     try {
       const response = await fetch(post.file);
@@ -387,9 +408,32 @@ const App = (() => {
 
       btn.addEventListener('click', () => {
         const code = pre.querySelector('code').innerText;
+        
+        // Glitch effect
+        btn.classList.add('copy-glitch');
+        const originalText = btn.textContent;
+        const targetText = 'COPIED!';
+        const chars = '01<>/_#X*';
+        let iterations = 0;
+
+        const scrambleInterval = setInterval(() => {
+          btn.textContent = targetText
+            .split('')
+            .map((char, index) => {
+              if (index < iterations) return targetText[index];
+              return chars[Math.floor(Math.random() * chars.length)];
+            })
+            .join('');
+          
+          if (iterations >= targetText.length) {
+            clearInterval(scrambleInterval);
+            btn.classList.add('copied');
+            btn.classList.remove('copy-glitch');
+          }
+          iterations += 0.5;
+        }, 3000 / targetText.length / 10); // Rapid scramble
+
         navigator.clipboard.writeText(code).then(() => {
-          btn.textContent = 'Copied!';
-          btn.classList.add('copied');
           setTimeout(() => {
             btn.textContent = 'Copy';
             btn.classList.remove('copied');
@@ -433,8 +477,10 @@ const App = (() => {
         e.preventDefault();
         const target = document.getElementById(heading.id);
         const headerHeight = document.getElementById('header').offsetHeight;
+        const targetTop = target.getBoundingClientRect().top + window.scrollY;
+
         window.scrollTo({
-          top: target.offsetTop - headerHeight - 20,
+          top: targetTop - headerHeight - 20,
           behavior: 'smooth'
         });
         // Update URL without jump
@@ -529,18 +575,34 @@ const App = (() => {
     const headings = Array.from(document.querySelectorAll('.markdown-body h2, .markdown-body h3'));
     const tocLinks = document.querySelectorAll('.toc__link');
     const headerHeight = document.getElementById('header').offsetHeight;
-    const scrollPos = window.scrollY + headerHeight + 50;
+    const scrollPos = window.scrollY + headerHeight + 100; // Increased buffer for better UX
 
     let activeId = '';
-    for (let i = headings.length - 1; i >= 0; i--) {
-      if (scrollPos >= headings[i].offsetTop) {
-        activeId = headings[i].id;
-        break;
+
+    // Check if we are at the bottom of the page
+    const isAtBottom = (window.innerHeight + window.scrollY) >= (document.documentElement.scrollHeight - 50);
+
+    if (isAtBottom && headings.length > 0) {
+      activeId = headings[headings.length - 1].id;
+    } else {
+      for (let i = headings.length - 1; i >= 0; i--) {
+        const targetTop = headings[i].getBoundingClientRect().top + window.scrollY;
+        if (scrollPos >= targetTop) {
+          activeId = headings[i].id;
+          break;
+        }
       }
     }
 
     tocLinks.forEach(link => {
-      link.classList.toggle('active', link.getAttribute('href') === `#${activeId}`);
+      const href = link.getAttribute('href');
+      const isActive = href === `#${activeId}`;
+      link.classList.toggle('active', isActive);
+      
+      // Optional: scroll the TOC sidebar to keep the active item visible if TOC is long
+      if (isActive && activeId) {
+        // link.scrollIntoView({ block: 'nearest', behavior: 'smooth' });
+      }
     });
   }
 
@@ -554,21 +616,196 @@ const App = (() => {
     }
   }
 
-  function showWelcome() {
+  function showAboutPage() {
     const contentEl = document.getElementById('post-content');
     if (!contentEl) return;
 
+    // Update page title
+    document.title = 'About — Daily NoteBook';
+
+    // Hide TOC since this is a static page
+    const toc = document.getElementById('toc');
+    if (toc) toc.style.display = 'none';
+
+    triggerGlitch(300);
+
+    const latestPost = [...POST_REGISTRY].sort((a, b) => b.date.localeCompare(a.date))[0];
+
     contentEl.innerHTML = `
-      <div class="welcome animate-fade-in">
-        <div class="welcome__icon">🛡️</div>
-        <h2 class="welcome__title">Daily NoteBook</h2>
-        <p class="welcome__text">
-          Welcome to my cybersecurity learning journal.<br>
-          Select a date from the sidebar to start reading,<br>
-          or use <kbd>←</kbd> <kbd>→</kbd> to navigate.
-        </p>
+      <div class="about-page animate-fade-in">
+
+        <!-- Hero -->
+        <div class="about-hero">
+          <div class="about-hero__avatar">
+            <div class="about-hero__avatar-inner">💻</div>
+          </div>
+          <div class="about-hero__text">
+            <h1 class="about-hero__name">Dương Lê Phú An</h1>
+            <p class="about-hero__title">Software Engineer → Network / Security Engineer</p>
+            <p class="about-hero__location">📍 Hồ Chí Minh, Việt Nam</p>
+          </div>
+        </div>
+
+        <div class="about-grid">
+
+          <!-- Left Column -->
+          <div class="about-col">
+
+            <!-- Về tôi -->
+            <div class="about-card">
+              <h2 class="about-card__title"><span class="about-card__icon">👤</span> Về tôi</h2>
+              <p class="about-card__text">
+                Tôi là một <strong>Software Engineer</strong> đang trên hành trình chuyển hướng sang lĩnh vực <strong>Network Engineering</strong> và <strong>Cybersecurity</strong>.
+                Nền tảng lập trình giúp tôi hiểu sâu hơn về cách hệ thống vận hành — và đó chính là lợi thế khi bước chân vào Security.
+              </p>
+              <p class="about-card__text">
+                Blog này là nhật ký học tập thực chiến hàng ngày của tôi — ghi lại từng buổi lab, từng lỗi sảy, từng ánh đèn "eureka" trên con đường chuyển ngành.
+              </p>
+              <p class="about-card__text">
+                Tôi tin rằng: <em>"Một lập trình viên hiểu mạng — và một kỹ sư mạng biết code — sẽ là vũ khí đáng sợ nhất."</em>
+              </p>
+            </div>
+
+            <!-- Mục tiêu Blog -->
+            <div class="about-card">
+              <h2 class="about-card__title"><span class="about-card__icon">🎯</span> Mục tiêu của Blog</h2>
+              <ul class="about-list">
+                <li>📝 Ghi lại hành trình chuyển ngành từ Software sang Network / Security</li>
+                <li>🌐 Nắm vững kiến thức CCNA — nền tảng bắt buộc của mọi Network Engineer</li>
+                <li>🔴 Thực hành các kỹ thuật Pentesting / Security trong môi trường lab an toàn</li>
+                <li>📈 Theo dõi tiến độ học tập cá nhân mỗi ngày — có chứng cứ, có kết quả</li>
+                <li>💡 Đóng góp trải nghiệm thực tế cho cộng đồng đang có cùng định hướng</li>
+              </ul>
+            </div>
+
+          </div>
+
+          <!-- Right Column -->
+          <div class="about-col">
+
+            <!-- Kỹ năng -->
+            <div class="about-card">
+              <h2 class="about-card__title"><span class="about-card__icon">⚡</span> Kỹ năng &amp; Công cụ</h2>
+              <div class="about-skills">
+                <div class="about-skill-group">
+                  <span class="about-skill-label">Software (Nền tảng)</span>
+                  <div class="about-skill-tags">
+                    <span class="tag">Python</span>
+                    <span class="tag">JavaScript</span>
+                    <span class="tag">SQL</span>
+                    <span class="tag">Git</span>
+                    <span class="tag">Linux CLI</span>
+                  </div>
+                </div>
+                <div class="about-skill-group">
+                  <span class="about-skill-label">Network (Đang học)</span>
+                  <div class="about-skill-tags">
+                    <span class="tag tag--secondary">CCNA</span>
+                    <span class="tag tag--secondary">TCP/IP</span>
+                    <span class="tag tag--secondary">Active Directory</span>
+                    <span class="tag tag--secondary">WinRM / SMB</span>
+                  </div>
+                </div>
+                <div class="about-skill-group">
+                  <span class="about-skill-label">Security (Lab thực chiến)</span>
+                  <div class="about-skill-tags">
+                    <span class="tag tag--accent">Nmap</span>
+                    <span class="tag tag--accent">Evil-WinRM</span>
+                    <span class="tag tag--accent">Mimikatz</span>
+                    <span class="tag tag--accent">Event Viewer</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Hành trình gần đây -->
+            <div class="about-card">
+              <h2 class="about-card__title"><span class="about-card__icon">🗓️</span> Hành trình gần đây</h2>
+              <div class="about-timeline">
+                <div class="about-timeline__item">
+                  <span class="about-timeline__date">15/05</span>
+                  <div>
+                    <div class="about-timeline__title">Chiến Ký Red vs Blue</div>
+                    <div class="about-timeline__desc">Pass-the-Hash, Golden Ticket &amp; Blue Team Defense</div>
+                  </div>
+                </div>
+                <div class="about-timeline__item">
+                  <span class="about-timeline__date">14/05</span>
+                  <div>
+                    <div class="about-timeline__title">Incident Response &amp; Forensics</div>
+                    <div class="about-timeline__desc">Điều tra sự cố AD qua Event Viewer</div>
+                  </div>
+                </div>
+                <div class="about-timeline__item">
+                  <span class="about-timeline__date">13/05</span>
+                  <div>
+                    <div class="about-timeline__title">AD Penetration Testing</div>
+                    <div class="about-timeline__desc">Full Kill Chain từ Recon đến Domain Compromise</div>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Lộ trình học tập -->
+            <div class="about-card">
+              <h2 class="about-card__title"><span class="about-card__icon">🗺️</span> Lộ trình chuyển ngành</h2>
+              <div class="about-roadmap">
+
+                <div class="about-roadmap__item about-roadmap__item--done">
+                  <div class="about-roadmap__badge">✓</div>
+                  <div class="about-roadmap__body">
+                    <div class="about-roadmap__title">Software Engineering</div>
+                    <div class="about-roadmap__desc">Nền tảng lập trình — Python, JS, SQL, Git</div>
+                  </div>
+                </div>
+
+                <div class="about-roadmap__item about-roadmap__item--active">
+                  <div class="about-roadmap__badge">▶</div>
+                  <div class="about-roadmap__body">
+                    <div class="about-roadmap__title">Network Fundamentals (CCNA)</div>
+                    <div class="about-roadmap__desc">TCP/IP, Routing, Active Directory, Lab thực chiến</div>
+                    <div class="about-roadmap__progress">
+                      <div class="about-roadmap__bar" style="width: 35%"></div>
+                    </div>
+                  </div>
+                </div>
+
+                <div class="about-roadmap__item about-roadmap__item--pending">
+                  <div class="about-roadmap__badge">○</div>
+                  <div class="about-roadmap__body">
+                    <div class="about-roadmap__title">CompTIA Network+ / Security+</div>
+                    <div class="about-roadmap__desc">Chứng chỉ quốc tế cho Network/Security Engineer</div>
+                  </div>
+                </div>
+
+                <div class="about-roadmap__item about-roadmap__item--pending">
+                  <div class="about-roadmap__badge">○</div>
+                  <div class="about-roadmap__body">
+                    <div class="about-roadmap__title">OSCP / Offensive Security</div>
+                    <div class="about-roadmap__desc">Mục tiêu dài hạn — Penetration Testing chuyên nghiệp</div>
+                  </div>
+                </div>
+
+              </div>
+            </div>
+
+
+          </div>
+        </div>
+
+        <!-- CTA -->
+        <div class="about-cta">
+          <p class="about-cta__text">Sẵn sàng vào trận?</p>
+          <button class="about-cta__btn" onclick="window.location.hash='#/${latestPost.date}'">
+            📖 Đọc bài mới nhất — ${latestPost.date}
+          </button>
+        </div>
+
       </div>`;
+
+    window.scrollTo({ top: 0, behavior: 'smooth' });
   }
+
 
   function setupMobileMenu() {
     const toggle = document.getElementById('menu-toggle');
@@ -631,28 +868,51 @@ const App = (() => {
 
   function renderMatrixEffects() {
     const containers = document.querySelectorAll('[data-matrix-bg]');
+    if (containers.length === 0) return;
+
+    // Track active theme sections
+    let activeTheme = null;
+
+    // Auto-switch global theme based on scroll position
+    const observer = new IntersectionObserver((entries) => {
+      entries.forEach(entry => {
+        if (entry.isIntersecting) {
+          const type = entry.target.getAttribute('data-matrix-bg');
+          activeTheme = type;
+          if (type === 'blue') {
+            ThemeManager.apply('light');
+          } else if (type === 'red') {
+            ThemeManager.apply('dark');
+          }
+        } else {
+          // If the one that was active is now hidden, restore default
+          if (activeTheme === entry.target.getAttribute('data-matrix-bg')) {
+            activeTheme = null;
+            ThemeManager.apply(ThemeManager.getSavedTheme());
+          }
+        }
+      });
+    }, { threshold: 0.2 });
+
     containers.forEach(container => {
-      // Prevent multiple canvases
+      observer.observe(container);
+
       if (container.querySelector('canvas.matrix-bg')) return;
       
       const colorType = container.getAttribute('data-matrix-bg');
       const isRed = colorType === 'red';
       
-      // Setup Container
       container.style.position = 'relative';
       container.style.overflow = 'hidden';
       
-      // Wrap content to keep it above
       const contentWrapper = document.createElement('div');
       contentWrapper.style.position = 'relative';
-      contentWrapper.style.zIndex = '1';
+      contentWrapper.style.zIndex = '2'; // High z-index to stay above canvas
       
-      // Move all current children into wrapper
       while (container.firstChild) {
         contentWrapper.appendChild(container.firstChild);
       }
       
-      // Create Canvas
       const canvas = document.createElement('canvas');
       canvas.className = 'matrix-bg';
       canvas.style.position = 'absolute';
@@ -660,37 +920,43 @@ const App = (() => {
       canvas.style.left = '0';
       canvas.style.width = '100%';
       canvas.style.height = '100%';
-      canvas.style.zIndex = '0';
+      canvas.style.zIndex = '1';
       canvas.style.pointerEvents = 'none';
-      canvas.style.opacity = '0.3'; // Reduced opacity to be subtle
+      canvas.style.opacity = isRed ? '0.4' : '0.2';
       
       container.appendChild(canvas);
       container.appendChild(contentWrapper);
       
-      // Matrix Animation
       const ctx = canvas.getContext('2d');
-      // Set actual size in memory (scaled to match display size)
-      canvas.width = container.offsetWidth;
-      canvas.height = container.offsetHeight;
+      const fontSize = 14;
+      let columns = 0;
+      let drops = [];
+
+      function resize() {
+        canvas.width = container.offsetWidth;
+        canvas.height = container.offsetHeight;
+        columns = Math.floor(canvas.width / fontSize);
+        drops = [];
+        for (let i = 0; i < columns; i++) {
+          drops[i] = Math.random() * -100;
+        }
+      }
+
+      window.addEventListener('resize', debounce(resize, 200));
+      resize();
       
       const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>/?~'.split('');
-      const fontSize = 14;
-      const columns = canvas.width / fontSize;
-      const drops = [];
-      for(let i = 0; i < columns; i++) {
-        drops[i] = Math.random() * -100; // random start above screen
-      }
-      
       const color = isRed ? '#ef4444' : '#3b82f6';
       
       function draw() {
-        ctx.fillStyle = isRed ? 'rgba(17, 24, 39, 0.1)' : 'rgba(255, 255, 255, 0.1)';
+        // Use colors that match the theme backgrounds set in CSS
+        ctx.fillStyle = isRed ? 'rgba(17, 24, 39, 0.15)' : 'rgba(255, 255, 255, 0.15)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         
         ctx.fillStyle = color;
-        ctx.font = fontSize + 'px monospace';
+        ctx.font = `bold ${fontSize}px monospace`;
         
-        for(let i = 0; i < drops.length; i++) {
+        for (let i = 0; i < drops.length; i++) {
           if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
             drops[i] = 0;
           }
@@ -703,15 +969,13 @@ const App = (() => {
         }
       }
       
-      // Use requestAnimationFrame instead of setInterval for better performance
       let lastTime = 0;
       function animate(time) {
-        if (time - lastTime > 50) {
+        if (time - lastTime > 40) {
           draw();
           lastTime = time;
         }
-        // check if element is still in DOM to stop animation
-        if(document.body.contains(canvas)) {
+        if (document.body.contains(canvas)) {
           requestAnimationFrame(animate);
         }
       }

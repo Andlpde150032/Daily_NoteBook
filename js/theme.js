@@ -57,5 +57,5 @@ const ThemeManager = (() => {
     }, 60000);
   }
 
-  return { init, toggle, getAutoTheme };
+  return { init, toggle, getAutoTheme, apply, getSavedTheme };
 })();

@@ -9,7 +9,9 @@ Tổng hợp các câu lệnh phòng thủ, xử lý sự cố và gia cố (Har
 | :--- | :--- | :--- |
 | `net user` | Thay đổi mật khẩu tài khoản ngay lập tức | `net user Administrator NewP@ssw0rd!` |
 | `Disable-LocalUser` | Vô hiệu hóa tài khoản (PowerShell) | `Disable-LocalUser -Name "Guest"` |
-| `Reset krbtgt` | Khởi tạo lại khóa Kerberos (Golden Ticket) | Chạy script Reset-KrbTgt-Password.ps1 hai lần |
+| **Reset krbtgt (x2)** | **BẮT BUỘC** thực hiện 2 lần để vô hiệu hóa hoàn toàn vé TGT cũ (Golden Ticket) | Chạy script `Reset-KrbTgt-Password.ps1` lần 1, đợi replicate, sau đó chạy lần 2. |
+| `Set-LocalUser` | Gán lại mật khẩu cho user local | `$pass = ConvertTo-SecureString "..." -AsPlainText -Force; Set-LocalUser -Name "User" -Password $pass` |
+
 
 ## 🚫 Xử lý Phiên làm việc (Session Management)
 | Command / Thao tác | Mô tả | Ví dụ |

