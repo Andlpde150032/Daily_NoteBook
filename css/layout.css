@@ -94,6 +94,8 @@
 }
 
 .toc-sidebar {
+  width: var(--toc-width);
+  flex-shrink: 0;
   padding: var(--space-8) var(--space-8) var(--space-8) 0;
   display: block;
 }
