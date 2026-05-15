@@ -21,6 +21,7 @@
   color: var(--color-text);
   position: relative;
   letter-spacing: -0.02em;
+  text-transform: none !important;
 }
 
 .markdown-body h1 { font-size: var(--text-3xl); }

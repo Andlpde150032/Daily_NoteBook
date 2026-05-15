@@ -20,7 +20,7 @@ const App = (() => {
     },
     {
       date: '2026-05-15',
-      title: 'CHIẾN KÝ RED VS BLUE: Trận Chiến Tại AnDLP',
+      title: 'AD Security Battle: Remediation & Persistence (Red vs Blue)',
       tags: ['blueteam', 'redteam', 'ad-pentest', 'incident-response', 'kerberos'],
       file: 'posts/2026-05-15.md'
     }
