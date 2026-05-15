@@ -608,32 +608,74 @@
 }
 /* ── Post Themes (Red vs Blue) ── */
 .theme-blue {
-  border-left: 4px solid var(--accent); /* blue accent */
-  padding-left: 1.5rem;
-  background: rgba(59, 130, 246, 0.05); /* very light blue background */
-  border-radius: 0 8px 8px 0;
-  margin-bottom: 2rem;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+  position: relative;
+  border-left: 4px solid #3b82f6;
+  padding: 2rem;
+  background: linear-gradient(145deg, #ffffff, #f0fdf4);
+  box-shadow: 0 10px 30px rgba(59, 130, 246, 0.1);
+  border-radius: 0 16px 16px 0;
+  margin-bottom: 3rem;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.theme-blue:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(59, 130, 246, 0.2);
 }
 
 .theme-red {
-  border-left: 4px solid #ef4444; /* red accent */
-  padding-left: 1.5rem;
-  background: rgba(239, 68, 68, 0.05); /* very light red background */
-  border-radius: 0 8px 8px 0;
-  margin-bottom: 2rem;
-  padding-top: 1rem;
-  padding-bottom: 1rem;
+  position: relative;
+  border-left: 4px solid #ef4444;
+  padding: 2rem;
+  background: #111827; /* Dark slate */
+  color: #f3f4f6; /* Light gray text */
+  box-shadow: 0 10px 30px rgba(239, 68, 68, 0.2);
+  border-radius: 0 16px 16px 0;
+  margin-bottom: 3rem;
+  overflow: hidden;
+  transition: transform 0.3s ease;
+}
+
+.theme-red:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px rgba(239, 68, 68, 0.4);
 }
 
 .theme-blue h2, .theme-blue h3 {
-  color: var(--accent);
+  color: #1e3a8a;
+  text-shadow: 0 0 10px rgba(59, 130, 246, 0.2);
 }
 
 .theme-red h2, .theme-red h3 {
   color: #ef4444;
+  text-shadow: 0 0 10px rgba(239, 68, 68, 0.5);
 }
+
+/* Adjust elements inside dark red theme */
+.theme-red strong {
+  color: #fca5a5;
+}
+
+.theme-red code {
+  background: rgba(0,0,0,0.5);
+  color: #f87171;
+  border: 1px solid rgba(239, 68, 68, 0.3);
+}
+
+.theme-red a {
+  color: #60a5fa;
+}
+
+.theme-red img {
+  box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+  border: 1px solid #374151;
+}
+
+.theme-blue img {
+  box-shadow: 0 4px 15px rgba(59, 130, 246, 0.15);
+}
+
 
 .notebook-entry__title {
   font-size: var(--text-sm);

@@ -230,7 +230,11 @@ const App = (() => {
         mermaid.run();
       }
 
+      // Render Matrix effects for Blue vs Red themes
+      renderMatrixEffects();
+
       window.scrollTo({ top: 0, behavior: 'smooth' });
+
 
       if (type === 'notebook') {
         renderNotebookList(); // Refresh active state
@@ -622,6 +626,96 @@ const App = (() => {
           input.dispatchEvent(new Event('input'));
         }
       });
+    });
+  }
+
+  function renderMatrixEffects() {
+    const containers = document.querySelectorAll('[data-matrix-bg]');
+    containers.forEach(container => {
+      // Prevent multiple canvases
+      if (container.querySelector('canvas.matrix-bg')) return;
+      
+      const colorType = container.getAttribute('data-matrix-bg');
+      const isRed = colorType === 'red';
+      
+      // Setup Container
+      container.style.position = 'relative';
+      container.style.overflow = 'hidden';
+      
+      // Wrap content to keep it above
+      const contentWrapper = document.createElement('div');
+      contentWrapper.style.position = 'relative';
+      contentWrapper.style.zIndex = '1';
+      
+      // Move all current children into wrapper
+      while (container.firstChild) {
+        contentWrapper.appendChild(container.firstChild);
+      }
+      
+      // Create Canvas
+      const canvas = document.createElement('canvas');
+      canvas.className = 'matrix-bg';
+      canvas.style.position = 'absolute';
+      canvas.style.top = '0';
+      canvas.style.left = '0';
+      canvas.style.width = '100%';
+      canvas.style.height = '100%';
+      canvas.style.zIndex = '0';
+      canvas.style.pointerEvents = 'none';
+      canvas.style.opacity = '0.3'; // Reduced opacity to be subtle
+      
+      container.appendChild(canvas);
+      container.appendChild(contentWrapper);
+      
+      // Matrix Animation
+      const ctx = canvas.getContext('2d');
+      // Set actual size in memory (scaled to match display size)
+      canvas.width = container.offsetWidth;
+      canvas.height = container.offsetHeight;
+      
+      const chars = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789@#$%^&*()_+-=[]{}|;:,.<>/?~'.split('');
+      const fontSize = 14;
+      const columns = canvas.width / fontSize;
+      const drops = [];
+      for(let i = 0; i < columns; i++) {
+        drops[i] = Math.random() * -100; // random start above screen
+      }
+      
+      const color = isRed ? '#ef4444' : '#3b82f6';
+      
+      function draw() {
+        ctx.fillStyle = isRed ? 'rgba(17, 24, 39, 0.1)' : 'rgba(255, 255, 255, 0.1)';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+        
+        ctx.fillStyle = color;
+        ctx.font = fontSize + 'px monospace';
+        
+        for(let i = 0; i < drops.length; i++) {
+          if (drops[i] * fontSize > canvas.height && Math.random() > 0.975) {
+            drops[i] = 0;
+          }
+          
+          if (drops[i] >= 0) {
+            const text = chars[Math.floor(Math.random() * chars.length)];
+            ctx.fillText(text, i * fontSize, drops[i] * fontSize);
+          }
+          drops[i]++;
+        }
+      }
+      
+      // Use requestAnimationFrame instead of setInterval for better performance
+      let lastTime = 0;
+      function animate(time) {
+        if (time - lastTime > 50) {
+          draw();
+          lastTime = time;
+        }
+        // check if element is still in DOM to stop animation
+        if(document.body.contains(canvas)) {
+          requestAnimationFrame(animate);
+        }
+      }
+      requestAnimationFrame(animate);
     });
   }
 
