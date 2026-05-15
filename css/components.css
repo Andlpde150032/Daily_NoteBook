@@ -606,6 +606,34 @@
 .notebook-entry:hover .notebook-entry__icon {
   filter: grayscale(0);
 }
+/* ── Post Themes (Red vs Blue) ── */
+.theme-blue {
+  border-left: 4px solid var(--accent); /* blue accent */
+  padding-left: 1.5rem;
+  background: rgba(59, 130, 246, 0.05); /* very light blue background */
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 2rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.theme-red {
+  border-left: 4px solid #ef4444; /* red accent */
+  padding-left: 1.5rem;
+  background: rgba(239, 68, 68, 0.05); /* very light red background */
+  border-radius: 0 8px 8px 0;
+  margin-bottom: 2rem;
+  padding-top: 1rem;
+  padding-bottom: 1rem;
+}
+
+.theme-blue h2, .theme-blue h3 {
+  color: var(--accent);
+}
+
+.theme-red h2, .theme-red h3 {
+  color: #ef4444;
+}
 
 .notebook-entry__title {
   font-size: var(--text-sm);

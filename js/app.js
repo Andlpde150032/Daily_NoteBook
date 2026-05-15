@@ -20,15 +20,9 @@ const App = (() => {
     },
     {
       date: '2026-05-15',
-      title: 'AD Incident Response - Hiệp 1: Gia Cố Thành Trì',
-      tags: ['blueteam', 'defense', 'hardening', 'firewall', 'incident-response'],
+      title: 'CHIẾN KÝ RED VS BLUE: Trận Chiến Tại AnDLP',
+      tags: ['blueteam', 'redteam', 'ad-pentest', 'incident-response', 'kerberos'],
       file: 'posts/2026-05-15.md'
-    },
-    {
-      date: '2026-05-16',
-      title: 'AD Penetration Testing - Hiệp 2: Sự Trỗi Dậy Của Hash',
-      tags: ['redteam', 'pass-the-hash', 'golden-ticket', 'kerberos', 'persistence'],
-      file: 'posts/2026-05-16.md'
     }
   ];
 
