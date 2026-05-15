@@ -17,6 +17,12 @@ const App = (() => {
       title: 'AD Incident Response & Forensics (Blue Team)',
       tags: ['blueteam', 'forensics', 'event-viewer', 'powershell', 'active-directory'],
       file: 'posts/2026-05-14.md'
+    },
+    {
+      date: '2026-05-15',
+      title: 'AD Incident Response - Hiệp 1: Gia Cố Thành Trì',
+      tags: ['blueteam', 'defense', 'hardening', 'firewall', 'incident-response'],
+      file: 'posts/2026-05-15.md'
     }
   ];
 
