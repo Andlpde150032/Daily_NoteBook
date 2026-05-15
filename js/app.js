@@ -18,14 +18,27 @@ const App = (() => {
       tags: ['blueteam', 'forensics', 'event-viewer', 'powershell', 'active-directory'],
       file: 'posts/2026-05-14.md'
     }
-    // ↓ Add new entries below ↓
-    // {
-    //   date: '2026-05-14',
-    //   title: 'Blue Team Defense & Event Viewer',
-    //   tags: ['blueteam', 'defense', 'event-viewer'],
-    //   file: 'posts/2026-05-14.md'
-    // }
   ];
+
+  // ── Cheatsheet Registry ──
+  const CHEATSHEET_REGISTRY = [
+    {
+      id: 'linux-base',
+      category: 'Linux',
+      title: 'Linux Essentials',
+      icon: '🐧',
+      file: 'cheatsheets/linux.md'
+    },
+    {
+      id: 'redteam-ad',
+      category: 'Red Team',
+      title: 'AD Pentest Cheatsheet',
+      icon: '🛡️',
+      file: 'cheatsheets/redteam.md'
+    }
+  ];
+
+  let viewMode = 'journal'; // 'journal' or 'notebook'
 
   async function init() {
     // 1. Theme
@@ -46,30 +59,173 @@ const App = (() => {
     // 6. Navigation buttons
     setupNavButtons();
 
+    // Initialize Tabs
+    setupTabs();
+
+    // Route initial hash
+    route();
+
     // 7. Render tags
     renderTags();
 
     // 8. TOC Active State on Scroll
     window.addEventListener('scroll', throttle(updateTOCActiveState, 100));
 
-    // 9. Load initial post (from URL hash or latest)
-    const hash = window.location.hash.replace('#/', '');
-    if (hash && POST_REGISTRY.find(p => p.date === hash)) {
-      DateNavigator.navigateTo(hash);
-    } else if (POST_REGISTRY.length > 0) {
-      const sorted = [...POST_REGISTRY].sort((a, b) => b.date.localeCompare(a.date));
-      DateNavigator.navigateTo(sorted[0].date);
-    } else {
-      showWelcome();
+    // 9. Listen hash changes
+    window.addEventListener('hashchange', route);
+  }
+
+  function route() {
+    const hash = window.location.hash || '#/';
+    
+    // Handle Notebook routes: #/notebook/id
+    if (hash.startsWith('#/notebook/')) {
+      const id = hash.replace('#/notebook/', '');
+      const sheet = CHEATSHEET_REGISTRY.find(s => s.id === id);
+      if (sheet) {
+        switchViewMode('notebook', false);
+        loadContent(sheet.file, 'notebook', id);
+        return;
+      }
     }
 
-    // 9. Listen hash changes
-    window.addEventListener('hashchange', () => {
-      const date = window.location.hash.replace('#/', '');
-      if (date && POST_REGISTRY.find(p => p.date === date)) {
+    // Handle Journal routes: #/yyyy-mm-dd
+    const datePattern = /^#\/(\d{4}-\d{2}-\d{2})$/;
+    const match = hash.match(datePattern);
+
+    if (match) {
+      const date = match[1];
+      if (POST_REGISTRY.find(p => p.date === date)) {
+        switchViewMode('journal', false);
         DateNavigator.navigateTo(date);
       }
+    } else if (hash === '#/') {
+      // Default: Load latest journal post
+      if (POST_REGISTRY.length > 0) {
+        const latest = [...POST_REGISTRY].sort((a, b) => b.date.localeCompare(a.date))[0];
+        window.location.hash = `#/${latest.date}`;
+      }
+    }
+  }
+
+  function setupTabs() {
+    const tabJournal = document.getElementById('tab-journal');
+    const tabNotebook = document.getElementById('tab-notebook');
+
+    if (tabJournal) {
+      tabJournal.addEventListener('click', () => {
+        if (viewMode === 'journal') return;
+        switchViewMode('journal');
+        // Load latest journal
+        const latest = [...POST_REGISTRY].sort((a, b) => b.date.localeCompare(a.date))[0];
+        window.location.hash = `#/${latest.date}`;
+      });
+    }
+    if (tabNotebook) {
+      tabNotebook.addEventListener('click', () => {
+        if (viewMode === 'notebook') return;
+        switchViewMode('notebook');
+        // Load first notebook
+        if (CHEATSHEET_REGISTRY.length > 0) {
+          window.location.hash = `#/notebook/${CHEATSHEET_REGISTRY[0].id}`;
+        }
+      });
+    }
+  }
+
+  function switchViewMode(mode, triggerRender = true) {
+    if (viewMode === mode && !triggerRender) return;
+    viewMode = mode;
+
+    // Update UI
+    const tabJournal = document.getElementById('tab-journal');
+    const tabNotebook = document.getElementById('tab-notebook');
+    
+    if (tabJournal) tabJournal.classList.toggle('sidebar__tab--active', mode === 'journal');
+    if (tabNotebook) tabNotebook.classList.toggle('sidebar__tab--active', mode === 'notebook');
+
+    if (triggerRender) {
+      if (mode === 'journal') {
+        DateNavigator.renderSidebar();
+      } else {
+        renderNotebookList();
+      }
+    }
+  }
+
+  function renderNotebookList() {
+    const container = document.getElementById('date-list');
+    if (!container) return;
+
+    container.innerHTML = '';
+
+    const groups = {};
+    CHEATSHEET_REGISTRY.forEach(sheet => {
+      if (!groups[sheet.category]) groups[sheet.category] = [];
+      groups[sheet.category].push(sheet);
     });
+
+    Object.keys(groups).forEach(cat => {
+      const catTitle = document.createElement('div');
+      catTitle.className = 'notebook-category';
+      catTitle.textContent = cat;
+      container.appendChild(catTitle);
+
+      groups[cat].forEach(sheet => {
+        const entry = document.createElement('div');
+        const isActive = window.location.hash === `#/notebook/${sheet.id}`;
+        entry.className = `notebook-entry ${isActive ? 'active' : ''}`;
+        entry.innerHTML = `
+          <span class="notebook-entry__icon">${sheet.icon}</span>
+          <span class="notebook-entry__title">${sheet.title}</span>
+        `;
+        entry.onclick = () => {
+          window.location.hash = `#/notebook/${sheet.id}`;
+        };
+        container.appendChild(entry);
+      });
+    });
+  }
+
+  async function loadContent(filePath, type, id) {
+    try {
+      const contentEl = document.getElementById('post-content');
+      contentEl.innerHTML = `
+        <div class="loading">
+          <div class="loading__spinner"></div>
+          <span>Loading content...</span>
+        </div>`;
+
+      const response = await fetch(filePath);
+      if (!response.ok) throw new Error(`HTTP ${response.status}`);
+      const rawMd = await response.text();
+      
+      // Cheatsheets usually don't have frontmatter, but we check anyway
+      const { body } = MarkdownRenderer.parseFrontmatter(rawMd);
+      
+      contentEl.innerHTML = `
+        <div class="markdown-body animate-fade-in" style="padding-top: var(--space-8);">
+          ${MarkdownRenderer.render(body)}
+        </div>`;
+
+      // Post-render
+      generateTOC();
+      setupImageModal();
+      hljs.highlightAll();
+      
+      if (window.mermaid) {
+        mermaid.run();
+      }
+
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+
+      if (type === 'notebook') {
+        renderNotebookList(); // Refresh active state
+      }
+    } catch (err) {
+      console.error(err);
+      contentEl.innerHTML = `<div class="error">Error loading content: ${err.message}</div>`;
+    }
   }
 
   async function loadPost(date) {
