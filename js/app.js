@@ -36,6 +36,13 @@ const App = (() => {
       file: 'cheatsheets/linux.md'
     },
     {
+      id: 'windows-base',
+      category: 'Windows',
+      title: 'Windows Essentials',
+      icon: '🪟',
+      file: 'cheatsheets/windows.md'
+    },
+    {
       id: 'redteam-ad',
       category: 'Red Team',
       title: 'AD Pentest Cheatsheet',
