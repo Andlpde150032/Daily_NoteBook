@@ -34,3 +34,13 @@ Tổng hợp các câu lệnh khai thác Active Directory phổ biến.
 | **Ticket Convert**| `impacket-ticketConverter v.kirbi v.ccache`| Chuyển đổi vé Windows sang Linux format |
 | **Kerberoasting** | `GetUserSPNs.py -request` | Trộm TGS hash của các Service Account |
 
+## ⚖️ Quy tắc vận hành chuyên nghiệp (ROE & OPSEC)
+| Quy tắc | Chi tiết & Tại sao |
+| :--- | :--- |
+| **Hạn chế dùng `sudo`** | Tránh để lại log rõ ràng trong `/var/log/auth.log`. Ưu tiên `su -` hoặc leo thang qua binary có SUID/Cap. |
+| **No Loud Scans** | Tránh `nmap -T4/T5`. Dùng `-T2` hoặc `--top-ports` để ẩn mình khỏi IDS. |
+| **Clean as you go** | Xóa tệp tin rác, remove temporary users và dọn dẹp Command History trước khi logout. |
+| **Timeline Documentation** | Ghi lại chính xác thời điểm thực hiện từng lệnh để đối soát (Deconfliction) với Blue Team. |
+| **Pivot Stealthily** | Không dùng máy tấn công chính (Main C2) để kết nối trực tiếp đến mọi node. Dùng Tunneling. |
+
+

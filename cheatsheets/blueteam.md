@@ -33,3 +33,13 @@ Tổng hợp các câu lệnh phòng thủ, xử lý sự cố và gia cố (Har
 | `auditpol` | Kiểm tra cấu hình Audit Policy hiện tại | `auditpol /get /category:*` |
 | `Turn on PowerShell Logging` | Bật ghi log script block (GPO) | GPO: `Computer Configuration > Admin Templates > Windows Components > PowerShell` |
 | `Event Viewer (eventvwr)` | Truy cập log hệ thống | `Security` (4624, 5140), `WinRM Operational` (91) |
+
+## ⚖️ Quy tắc vận hành & Phản ứng chuyên nghiệp
+| Quy tắc | Chi tiết & Tại sao |
+| :--- | :--- |
+| **Hạn chế dùng Domain Admin** | Tránh rò rỉ credential cấp cao trên các máy trạm (Workstations). Dùng Local Admin hoặc gMSA. |
+| **Preserve Evidence** | Không reboot máy ngay lập tức nếu nghi ngờ bị nhiễm (để giữ Memory/RAM Forensics). |
+| **Isolate, Don't Delete** | Cách ly (Quarantine) hoặc Snapshot máy chủ bị nhiễm thay vì xóa bỏ ngay để điều tra gốc rễ. |
+| **Never clear logs** | Không bao giờ xóa Event Log để "tiết kiệm dung lượng" trong lúc đang xử lý sự cố. |
+| **Verify before Trust** | Luôn quét lại (Re-scan) và kiểm tra tính toàn vẹn (Integrity) sau khi áp dụng bản vá hoặc remediation. |
+
