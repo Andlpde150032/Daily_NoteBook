@@ -55,6 +55,13 @@ const App = (() => {
       title: 'Defense & Hardening',
       icon: '🛡️',
       file: 'cheatsheets/blueteam.md'
+    },
+    {
+      id: 'ad-handbook',
+      category: 'Active Directory',
+      title: 'AD Lab Command Dictionary',
+      icon: '📕',
+      file: 'cheatsheets/ad-handbook.md'
     }
   ];
 
